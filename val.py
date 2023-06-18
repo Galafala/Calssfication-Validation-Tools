@@ -45,14 +45,19 @@ def main(opt):
     image_size = opt.get('imgsz')
     model_name = opt.get('name')
 
+    """Load model and turn it into evaluation mode"""
     model = torch.load(weights)
     model = model.to(device)
     model.eval()
 
+    """Load testing data"""
     data_transforms = data_transform(image_size)
     test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])
+
+    """Predict"""
     pred, true, paths = predict(test_dataset, model, batch_size, device)
     
+    """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
     cm = confusion_matrix(true, pred)
     nor_cm = confusion_matrix(true, pred, normalize="true")
@@ -61,7 +66,6 @@ def main(opt):
 
     # image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
     new_val_classes = test_dataset.classes
-
     plot_matrix(nor_cm, new_val_classes, model_name)
 
 
