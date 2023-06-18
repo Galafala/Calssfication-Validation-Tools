@@ -1,3 +1,11 @@
+"""
+Quick start:
+
+python3 test.py --weights "home.pth" --data "/home/ubuntu/" --batch-size 8 --device 2 --imgsz 1024 --name "Project"
+
+I hold your back bro.
+""" 
+
 from __future__ import print_function
 from __future__ import division
 import os
@@ -27,12 +35,12 @@ def parse_opt(known=False):
     return opt
 
 def main(opt):
-    weights = opt.weights
-    data_dir = opt.data
-    batch_size = opt.batch_size
-    device = opt.device
-    image_size = opt.imgsz
-    model_name = opt.name
+    weights = opt.get('weights')
+    data_dir = opt.get('data')
+    batch_size = opt.get('batch_size')
+    device = opt.get('device')
+    image_size = opt.get('imgsz')
+    model_name = opt.get('name')
 
     model = torch.load(weights)
     model = model.to(device)
@@ -57,4 +65,16 @@ def main(opt):
 
 if __name__ == "__main__":
     opt = parse_opt()
+    opt = vars(opt)
+    
+    for key in opt.keys():
+        if opt.get(key) is None:
+            value = input(f"Please input {key} values: ")
+
+            if key in ["device", "batch_size"]:
+                value = int(value)
+
+            opt[key] = value
+
+    print(opt)
     main(opt)

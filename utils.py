@@ -80,5 +80,5 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
     ax.set_ylabel('True', fontsize=24, fontweight ='bold')
     ax.set_xlabel('Predicted', fontsize=24, fontweight ='bold')
 
-    plt.savefig(f'/run/{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
+    plt.savefig(f'/{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     plt.show()
