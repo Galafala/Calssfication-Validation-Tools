@@ -9,9 +9,8 @@ Ben,
 June 18th, 2023
 """ 
 
-from __future__ import print_function
-from __future__ import division
-import os
+# from __future__ import print_function
+# from __future__ import division
 import argparse
 import torch
 import torch.nn as nn
@@ -52,7 +51,7 @@ def main(opt):
 
     """Load testing data"""
     data_transforms = data_transform(image_size)
-    test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])
+    test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])
 
     """Predict"""
     pred, true, paths = predict(test_dataset, model, batch_size, device)
