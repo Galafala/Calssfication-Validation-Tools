@@ -4,6 +4,9 @@ Quick start:
 python3 test.py --weights "home.pth" --data "/home/ubuntu/" --batch-size 8 --device 2 --imgsz 1024 --name "Project"
 
 I hold your back bro.
+
+Ben,
+June 18th, 2023
 """ 
 
 from __future__ import print_function
