@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python train.py  --model "efficientnet_b2" --epoch 200 --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/train_val" --batch-size 64 --device 2 --imgsz 224
+python train.py  --model "efficientnet_b2" --epoch 200 --num-classes 2 --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/train_val" --batch-size 64 --device 2 --imgsz 224
 
 I hold your back bro.
 
@@ -117,10 +117,10 @@ if __name__ == "__main__":
         if opt.get(key) is None:
             value = input(f"Please input {key} values: ")
 
-            if key in ["device", "batch_size", "epoch"]:
+            if key in ["device", "batch_size", "epoch", "num_classes"]:
                 value = int(value)
 
             opt[key] = value
 
-    print(opt)
+    print(key, value: for key, value in opt.item())
     main(opt)

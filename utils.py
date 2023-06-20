@@ -124,7 +124,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     # Initialize these variables which will be set in this if statement. Each of these
     #   variables is model specific.
     model_ft = None
-    input_size = 0
 
     if model_name == "resnet":
         """ Resnet18
@@ -133,7 +132,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
 
     elif model_name == "alexnet":
         """ Alexnet
@@ -150,7 +148,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
         model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-        input_size = 224
 
     elif model_name == "squeezenet":
         """ Squeezenet
@@ -159,7 +156,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         set_parameter_requires_grad(model_ft, feature_extract)
         model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1))
         model_ft.num_classes = num_classes
-        input_size = 224
 
     elif model_name == "densenet":
         """ Densenet
@@ -168,7 +164,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier.in_features
         model_ft.classifier = nn.Linear(num_ftrs, num_classes)
-        input_size = 224
 
     elif model_name == "inception":
         """ Inception v3
@@ -189,8 +184,8 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         """
         model_ft = models.efficientnet_b2(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        num_ftrs = model_ft.classifier.in_features
+        model_ft.classfier = nn.Linear(num_ftrs, num_classes)
 
     else:
         print("Invalid model name, exiting...")
