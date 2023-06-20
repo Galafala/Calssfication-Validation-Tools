@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python3 test.py --weights "home.pth" --data "/home/ubuntu/" --batch-size 8 --device 2 --imgsz 1024 --name "Project"
+python3 val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/test" --batch-size 8 --device 2 --imgsz 1024 --name "Confusion matrix"
 
 I hold your back bro.
 
@@ -46,8 +46,10 @@ def main(opt):
     model_name = opt.get('name')
 
     """Load model and turn it into evaluation mode"""
-    model = torch.load(weights)
-    model = efficientnet_b2.load_state_dict(model['state_dict'])
+    checkpoint = torch.load(weights)
+    # efficientnet_b2 = efficientnet_b2()
+    # model = efficientnet_b2.load_state_dict(model['state_dict'])
+    model = checkpoint['model']
     model = model.to(device)
     model.eval()
 

@@ -6,4 +6,4 @@ numpy>=1.18.5
 torch>=1.7.0  # see https://pytorch.org/get-started/locally (recommended)
 torchvision>=0.8.1
 seaborn
-sklearn
+scikit-learn
