@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/test" --batch-size 8 --device 2 --imgsz 1024 --name "Confusion matrix"
+python val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/test" --batch-size 8 --device 2 --imgsz 1024
 
 I hold your back bro.
 
@@ -44,18 +44,16 @@ def main(opt):
 
     """Load model"""
     checkpoint = torch.load(weights)
+    print(checkpoint)
     model = efficientnet_b2()
     model.load_state_dict(checkpoint['state_dict'], strict=False) # trun .pyh.tar into readilbe
-    print(model.classes)
-    
+
     """Load testing data"""
     data_transforms = data_transform(image_size)
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
 
     """Predict"""
     pred, true, _ = predict(test_dataset, model, batch_size, device)
-    print(true)
-    print(pred)
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
