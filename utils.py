@@ -1,11 +1,7 @@
-# import time
-# import copy
 import torch
-# import torch.nn as nn
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import seaborn as sns
-# import numpy as np
 
 def data_transform(input_size):
     data_transforms = {
@@ -40,7 +36,7 @@ def predict(test_set, model, batch_size, device):
     
     
     with torch.no_grad():
-        for i, (images, target, path) in enumerate(test_loader):
+        for _, (images, target, path) in enumerate(test_loader):
             images = images.to(device)
             target = target.to(device)
             output = model(images)
