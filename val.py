@@ -47,9 +47,8 @@ def main(opt):
 
     """Load model and turn it into evaluation mode"""
     checkpoint = torch.load(weights)
-    efficientnet = efficientnet_b2()
-    model = efficientnet.load_state_dict(checkpoint['state_dict'])
-    # model = checkpoint['model']
+    model = efficientnet_b2()
+    model.load_state_dict(checkpoint['state_dict'])
     model = model.to(device)
     model.eval()
 
