@@ -57,11 +57,11 @@ def main(opt):
     checkpoint = torch.load(weights)
     model = efficientnet_b2()
     model.load_state_dict(checkpoint['state_dict'], strict=False)
-    model = model.to(device)
-    model.eval()
+    # model = model.to(device)
+    # model.eval()
 
     """Load testing data"""
-    test_dataset = datasets.ImageFolder(os.path.join(data_dir, 'test'), data_transforms['val'])
+    test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])    
 
     """Predict"""
     pred, true, _ = predict(test_dataset, model, batch_size, device)
@@ -73,6 +73,7 @@ def main(opt):
     print(f'Accuracy : {acc_score}')
     print(f'Confusion Matrix :\n {cm}')
 
+    test_dataset = datasets.ImageFolder(os.path.join(data_dir, 'test'), data_transforms['val'])
     new_val_classes = test_dataset['test'].classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
