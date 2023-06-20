@@ -123,6 +123,6 @@ if __name__ == "__main__":
             opt[key] = value
 
     for key, value in opt.items():
-        print(f"{key}: value")
-        
+        print(f"{key}: {value}")
+
     main(opt)
