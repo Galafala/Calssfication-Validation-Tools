@@ -49,7 +49,7 @@ def main(opt):
 
 
     # Create training and validation datasets
-    # image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
+    image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
     # Create training and validation dataloaders
     # dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
     
@@ -78,6 +78,7 @@ def main(opt):
     new_val_classes = image_datasets['test'].classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
+    print("I'm so handsome.")
 
 
 if __name__ == "__main__":
