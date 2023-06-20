@@ -13,9 +13,10 @@ June 18th, 2023
 # from __future__ import division
 import argparse
 import torch
-import torch.nn as nn
-import torch.optim as optim
+# import torch.nn as nn
+# import torch.optim as optim
 import torchvision
+from torchvision.models import efficientnet_b2
 # from torchvision import datasets
 
 from utils import data_transform, predict, ImageFolderWithPaths, plot_matrix
@@ -46,6 +47,7 @@ def main(opt):
 
     """Load model and turn it into evaluation mode"""
     model = torch.load(weights)
+    model = efficientnet_b2.load_state_dict(model['state_dict'])
     model = model.to(device)
     model.eval()
 
@@ -54,7 +56,7 @@ def main(opt):
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])
 
     """Predict"""
-    pred, true, paths = predict(test_dataset, model, batch_size, device)
+    pred, true, _ = predict(test_dataset, model, batch_size, device)
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
