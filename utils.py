@@ -193,7 +193,6 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft
 
 def predict(test_set, model, batch_size, device):
-    
     y_pred = []
     y_true = []
     paths = []

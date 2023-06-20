@@ -27,10 +27,12 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default=None, help="model's name")
     parser.add_argument('--epoch', type=int, default=None, help='epochs')
+    parser.add_argument('--lr', type=int, default=0.005, help='learning rate')
+    parser.add_argument('--momentum', type=int, default=0.9, help='momentum')
     parser.add_argument('--num-classes', type=int, default=None, help='num')
-    parser.add_argument('--data', type=str, default=None, help='dataset directory path')
     parser.add_argument('--batch-size', type=int, default=16, help='total batch size for all GPUs')
     parser.add_argument('--device', type=int, default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--data', type=str, default=None, help='dataset directory path')
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='inference size (pixels)')
 
     opt = parser.parse_args()
@@ -39,6 +41,8 @@ def parse_opt(known=False):
 def main(opt):
     model_name = opt.get('model')
     num_epochs = opt.get('epoch')
+    lr = opt.get('lr')
+    momentum = opt.get('momentum')
     num_classes = opt.get('num_classes')
     data_dir = opt.get('data')
     batch_size = opt.get('batch_size')
@@ -53,18 +57,20 @@ def main(opt):
     """Initialize the model for this run"""
     model_ft = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
-    # Data augmentation and normalization for training
-    # Just normalization for validation    
+    """
+    Data augmentation and normalization for training
+    Just normalization for validation  
+    """  
     data_transforms = data_transform(input_size)
     
     print("Initializing Datasets and Dataloaders...")    
 
-    # Create training and validation datasets
+    """Create training and validation datasets"""
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
-    # Create training and validation dataloaders
+    """Create training and validation dataloaders"""
     dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
 
-    # Send the model to GPU
+    """Send the model to GPU"""
     model_ft = model_ft.to(device)
 
     """    
@@ -76,18 +82,17 @@ def main(opt):
     """
     params_to_update = model_ft.parameters()
 
+    print("Params to learn:")
     for name,param in model_ft.named_parameters():
         if param.requires_grad == True:
             print("\t",name)
 
-    print("Params to learn:")
-
     """Observe that all parameters are being optimized"""
-    optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
+    optimizer_ft = optim.SGD(params_to_update, lr=lr, momentum=momentum)
     """Setup the loss fxn"""
     criterion = nn.CrossEntropyLoss()
 
-    # Train and evaluate
+    """Train and evaluate"""    
     model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"))
     
     plot_val_train_hist(num_epochs, val_loss_hist, train_loss_hist, model_name, 'Loss')
@@ -104,7 +109,7 @@ def main(opt):
 
     new_val_classes = image_datasets['val'].classes
     print(new_val_classes)
-    plot_matrix(nor_cm, new_val_classes, "Confusion Matrix")
+    plot_matrix(nor_cm, new_val_classes, 'confusion_matrix')
 
     print("I'm so handsome.")
 
