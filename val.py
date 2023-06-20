@@ -69,6 +69,7 @@ def main(opt):
     print(f'Confusion Matrix :\n {cm}')
 
     new_val_classes = test_dataset.classes
+    print(new_val_classes)
     plot_matrix(nor_cm, new_val_classes, model_name)
 
     print("I'm so handsome.")
