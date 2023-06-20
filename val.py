@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining" --batch-size 8 --device 2 --imgsz 1024 --name "Confusion matrix"
+python val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/test" --batch-size 8 --device 2 --imgsz 1024 --name "Confusion matrix"
 
 I hold your back bro.
 
@@ -47,19 +47,19 @@ def main(opt):
     image_size = opt.get('imgsz')
     model_name = opt.get('name')
     
-    """Load model and turn it into evaluation mode"""
+    """Load model"""
     checkpoint = torch.load(weights)
     model = efficientnet_b2()
-    model.load_state_dict(checkpoint['state_dict'], strict=False)
-    # model = model.to(device)
-    # model.eval()
+    model.load_state_dict(checkpoint['state_dict'], strict=False) # trun .pyh.tar into readilbe
 
     """Load testing data"""
     data_transforms = data_transform(image_size)
-    test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])    
+    test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
 
     """Predict"""
     pred, true, _ = predict(test_dataset, model, batch_size, device)
+    print(true)
+    print(pred)
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
@@ -68,7 +68,6 @@ def main(opt):
     print(f'Accuracy : {acc_score}')
     print(f'Confusion Matrix :\n {cm}')
 
-    test_dataset = datasets.ImageFolder(os.path.join(data_dir, 'test'), data_transforms['val'])
     new_val_classes = test_dataset.classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
