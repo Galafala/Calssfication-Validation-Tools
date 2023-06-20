@@ -75,7 +75,7 @@ def main(opt):
     print(f'Confusion Matrix :\n {cm}')
 
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
-    new_val_classes = image_datasets['val'].classes
+    new_val_classes = image_datasets['test'].classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
 
