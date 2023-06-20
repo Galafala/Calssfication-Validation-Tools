@@ -48,10 +48,10 @@ def main(opt):
     model_name = opt.get('name')
 
     data_transforms = data_transform(image_size )
-    # Create training and validation datasets
-    image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
-    # Create training and validation dataloaders
-    dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
+    # # Create training and validation datasets
+    # image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
+    # # Create training and validation dataloaders
+    # dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
     
     """Load model and turn it into evaluation mode"""
     checkpoint = torch.load(weights)
@@ -61,7 +61,7 @@ def main(opt):
     model.eval()
 
     """Load testing data"""
-    test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])
+    test_dataset = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
 
     """Predict"""
     pred, true, _ = predict(test_dataset, model, batch_size, device)
