@@ -11,6 +11,7 @@ June 18th, 2023
 
 # from __future__ import print_function
 # from __future__ import division
+import os
 import argparse
 import torch
 # import torch.nn as nn
@@ -48,9 +49,9 @@ def main(opt):
 
 
     # Create training and validation datasets
-    image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
+    # image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
     # Create training and validation dataloaders
-    dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
+    # dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
     
     """Load model and turn it into evaluation mode"""
     checkpoint = torch.load(weights)
@@ -73,9 +74,8 @@ def main(opt):
     print(f'Accuracy : {acc_score}')
     print(f'Confusion Matrix :\n {cm}')
 
-    # image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
-    new_val_classes = test_dataset.classes
-    # new_val_classes = image_datasets['val'].classes
+    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
+    new_val_classes = image_datasets['val'].classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
 
