@@ -5,4 +5,5 @@ python train.py\
  --data "/home/nas/Research_Group/Personal/Andrew/birth_event_detection/dataset/train_and_val"\
  --batch-size 64\
  --device 2\
- --imgsz 224
+ --imgsz 224\
+ --patience 30
