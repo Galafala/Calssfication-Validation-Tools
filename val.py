@@ -9,10 +9,18 @@ Ben,
 June 18th, 2023
 """ 
 
+# from __future__ import print_function
+# from __future__ import division
+import os
 import argparse
 import torch
+# import torch.nn as nn
+# import torch.optim as optim
 import torchvision
+from torchvision import datasets
 from torchvision.models import efficientnet_b2
+# from torchvision import datasets
+
 from utils import data_transform, predict, ImageFolderWithPaths, plot_matrix
 from sklearn.metrics import confusion_matrix, accuracy_score
 
