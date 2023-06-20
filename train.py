@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python train.py  --model "efficientnet_b2" --epoch 200 --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/train_val" --batch-size 8 --device 2 --imgsz 1024
+python train.py  --model "efficientnet_b2" --epoch 200 --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/train_val" --batch-size 64 --device 2 --imgsz 224
 
 I hold your back bro.
 
@@ -37,12 +37,13 @@ def parse_opt(known=False):
     return opt
 
 def main(opt):
+    model_name = opt.get('model')
+    num_epochs = opt.get('epoch')
+    num_classes = opt.get('num_classes')
     data_dir = opt.get('data')
     batch_size = opt.get('batch_size')
     device = opt.get('device')
     input_size = opt.get('imgsz')
-    model_name = opt.get('name')
-    num_epochs = opt.get('epoch')
     feature_extract = None
     
     os.makedirs(os.path.join(Path().resolve(), 'run'), exist_ok=True)
@@ -65,11 +66,14 @@ def main(opt):
 
     # Send the model to GPU
     model_ft = model_ft.to(device)
-    # Gather the parameters to be optimized/updated in this run. If we are
-    #  finetuning we will be updating all parameters. However, if we are
-    #  doing feature extract method, we will only update the parameters
-    #  that we have just initialized, i.e. the parameters with requires_grad
-    #  is True.
+
+    """    
+    Gather the parameters to be optimized/updated in this run. If we are
+    finetuning we will be updating all parameters. However, if we are
+    doing feature extract method, we will only update the parameters
+    that we have just initialized, i.e. the parameters with requires_grad
+    is True.
+    """
     params_to_update = model_ft.parameters()
 
     for name,param in model_ft.named_parameters():
@@ -78,9 +82,9 @@ def main(opt):
 
     print("Params to learn:")
 
-    # Observe that all parameters are being optimized
+    """Observe that all parameters are being optimized"""
     optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
-    # Setup the loss fxn
+    """Setup the loss fxn"""
     criterion = nn.CrossEntropyLoss()
 
     # Train and evaluate
