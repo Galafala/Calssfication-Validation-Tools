@@ -47,9 +47,9 @@ def main(opt):
     image_size = opt.get('imgsz')
     model_name = opt.get('name')
 
-
+    data_transforms = data_transform(image_size )
     # Create training and validation datasets
-    image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transform[x]) for x in ['train', 'val']}
+    image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
     # Create training and validation dataloaders
     # dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
     
@@ -61,7 +61,6 @@ def main(opt):
     model.eval()
 
     """Load testing data"""
-    data_transforms = data_transform(image_size)
     test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])
 
     """Predict"""
