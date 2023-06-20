@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python3 val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/test" --batch-size 8 --device 2 --imgsz 1024 --name "Confusion matrix"
+python val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining" --batch-size 8 --device 2 --imgsz 1024 --name "Confusion matrix"
 
 I hold your back bro.
 
@@ -16,6 +16,7 @@ import torch
 # import torch.nn as nn
 # import torch.optim as optim
 import torchvision
+from torchvision import datasets
 from torchvision.models import efficientnet_b2
 # from torchvision import datasets
 
@@ -45,6 +46,12 @@ def main(opt):
     image_size = opt.get('imgsz')
     model_name = opt.get('name')
 
+
+    # Create training and validation datasets
+    image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
+    # Create training and validation dataloaders
+    dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=16) for x in ['train', 'val']}
+    
     """Load model and turn it into evaluation mode"""
     checkpoint = torch.load(weights)
     model = efficientnet_b2()
@@ -54,7 +61,7 @@ def main(opt):
 
     """Load testing data"""
     data_transforms = data_transform(image_size)
-    test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])
+    test_dataset = ImageFolderWithPaths(f"{data_dir}/test", data_transforms["val"])
 
     """Predict"""
     pred, true, _ = predict(test_dataset, model, batch_size, device)
@@ -68,6 +75,7 @@ def main(opt):
 
     # image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
     new_val_classes = test_dataset.classes
+    # new_val_classes = image_datasets['val'].classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
 
