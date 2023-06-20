@@ -27,7 +27,6 @@ def parse_opt(known=False):
     parser.add_argument('--batch-size', type=int, default=16, help='total batch size for all GPUs')
     parser.add_argument('--device', type=int, default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='inference size (pixels)')
-    parser.add_argument('--name', type=str, default=None, help="model's name")
 
     opt = parser.parse_args()
     return opt
@@ -38,13 +37,17 @@ def main(opt):
     batch_size = opt.get('batch_size')
     device = opt.get('device')
     image_size = opt.get('imgsz')
-    model_name = opt.get('name')
-    
+    model_name = "Confusion Matrix"
+
+    """Detect if we have a GPU available"""
+    device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
+
     """Load model"""
     checkpoint = torch.load(weights)
     model = efficientnet_b2()
     model.load_state_dict(checkpoint['state_dict'], strict=False) # trun .pyh.tar into readilbe
-
+    print(model.classes)
+    
     """Load testing data"""
     data_transforms = data_transform(image_size)
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
