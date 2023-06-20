@@ -51,7 +51,7 @@ def main(opt):
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
 
     """Initialize the model for this run"""
-    model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
+    model_ft = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
     # Data augmentation and normalization for training
     # Just normalization for validation    
