@@ -47,7 +47,7 @@ def main(opt):
     image_size = opt.get('imgsz')
     model_name = opt.get('name')
 
-    data_transforms = data_transform(image_size )
+    data_transforms = data_transform(image_size)
     # # Create training and validation datasets
     # image_datasets = {x: datasets.ImageFolder(os.path.join("/home/nas/Research_Group/Personal/Andrew/modelTraining/train_and_val", x), data_transforms[x]) for x in ['train', 'val']}
     # # Create training and validation dataloaders
@@ -61,7 +61,7 @@ def main(opt):
     model.eval()
 
     """Load testing data"""
-    test_dataset = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
+    test_dataset = datasets.ImageFolder(os.path.join(data_dir, 'test'), data_transforms['val'])
 
     """Predict"""
     pred, true, _ = predict(test_dataset, model, batch_size, device)
@@ -73,8 +73,7 @@ def main(opt):
     print(f'Accuracy : {acc_score}')
     print(f'Confusion Matrix :\n {cm}')
 
-    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['test']}
-    new_val_classes = image_datasets['test'].classes
+    new_val_classes = test_dataset['test'].classes
     plot_matrix(nor_cm, new_val_classes, model_name)
 
     print("I'm so handsome.")

@@ -1,11 +1,11 @@
-import time
-import copy
+# import time
+# import copy
 import torch
-import torch.nn as nn
-from torchvision import datasets, models, transforms
+# import torch.nn as nn
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
+# import numpy as np
 
 def data_transform(input_size):
     data_transforms = {
