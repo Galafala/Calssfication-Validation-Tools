@@ -122,7 +122,7 @@ def data_transform(input_size):
     
 def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
     # Initialize these variables which will be set in this if statement. Each of these
-    #   variables is model specific.
+    # variables is model specific.
     model_ft = None
 
     if model_name == "resnet":
@@ -231,6 +231,9 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy = 'Loss'):
+    val_hist = val_hist.cpu().numpy()
+    train_hist = train_hist.cpu().numpy()
+
     x=np.arange(0,num_epochs,1)
     plt.figure(figsize=(9,9))
     plt.plot(x, val_hist, label='test', color = 'limegreen', linewidth=2)
@@ -240,8 +243,8 @@ def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Ac
     plt.ylabel(Loss_or_Accuracy)
     plt.xlabel('Epoch')
     plt.legend()
-    plt.savefig(f'{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
-    plt.show()
+    plt.savefig(f'/run/{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
+    # plt.show()
 
 def plot_matrix(cm, classes="", name="confusion_matrix"):
 #     matplotlib.rcParams['font.sans-serif'] = ['Uuntu Mono'] 
@@ -258,4 +261,4 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
     ax.set_xlabel('Predicted', fontsize=24, fontweight ='bold')
 
     plt.savefig(f'/run/{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
-    plt.show()
+    # plt.show()

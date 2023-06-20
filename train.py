@@ -94,12 +94,14 @@ def main(opt):
 
     """Train and evaluate"""    
     model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"))
-    
+    torch.save(model_ft, f'/run/{model_name}.pth')
+
     plot_val_train_hist(num_epochs, val_loss_hist, train_loss_hist, model_name, 'Loss')
     plot_val_train_hist(num_epochs, val_acc_hist, train_acc_hist, model_name, 'Accuracy')
 
-    pred, true, _ = predict(image_datasets['val'], model_ft, batch_size, device)
-
+    pred, true, paths = predict(image_datasets['val'], model_ft, batch_size, device)
+    print(paths)
+    
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
     cm = confusion_matrix(true, pred)

@@ -44,7 +44,6 @@ def main(opt):
 
     """Load model"""
     checkpoint = torch.load(weights)
-    print(checkpoint)
     model = efficientnet_b2()
     model.load_state_dict(checkpoint['state_dict'], strict=False) # trun .pyh.tar into readilbe
 
