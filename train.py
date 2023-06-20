@@ -31,6 +31,7 @@ def parse_opt(known=False):
     parser.add_argument('--momentum', type=int, default=0.9, help='momentum')
     parser.add_argument('--num-classes', type=int, default=None, help='num')
     parser.add_argument('--batch-size', type=int, default=16, help='total batch size for all GPUs')
+    parser.add_argument('--patience', type=int, default=50, help='eraly stop ')
     parser.add_argument('--device', type=int, default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--data', type=str, default=None, help='dataset directory path')
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=224, help='inference size (pixels)')
@@ -46,6 +47,7 @@ def main(opt):
     num_classes = opt.get('num_classes')
     data_dir = opt.get('data')
     batch_size = opt.get('batch_size')
+    patience = opt.get('patience')
     device = opt.get('device')
     input_size = opt.get('imgsz')
     feature_extract = None
@@ -93,7 +95,7 @@ def main(opt):
     criterion = nn.CrossEntropyLoss()
 
     """Train and evaluate"""    
-    model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"))
+    model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience)
     torch.save(model_ft, f'/run/{model_name}.pth')
 
     plot_val_train_hist(num_epochs, val_loss_hist, train_loss_hist, model_name, 'Loss')
@@ -101,7 +103,7 @@ def main(opt):
 
     pred, true, paths = predict(image_datasets['val'], model_ft, batch_size, device)
     print(paths)
-    
+
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
     cm = confusion_matrix(true, pred)
