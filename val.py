@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python val.py --weights "/home/nas/Research_Group/Personal/Andrew/model_best.pth.tar" --data "/home/nas/Research_Group/Personal/Andrew/modelTraining/test" --batch-size 8 --device 2 --imgsz 1024
+python val.py --weights "/home/ubuntu/Classification-Validation-Tools/weight.pth" --data "/home/nas/Research_Group/Personal/Andrew/birth_event_detection/dataset/train_and_val/val" --batch-size 64 --device 2 --imgsz 224
 
 I hold your back bro.
 
@@ -43,9 +43,12 @@ def main(opt):
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
 
     """Load model"""
-    checkpoint = torch.load(weights)
-    model = efficientnet_b2()
-    model.load_state_dict(checkpoint['state_dict'], strict=False) # trun .pyh.tar into readilbe
+    if weights.endswith('.tar'):
+        checkpoint = torch.load(weights)
+        model = efficientnet_b2()
+        model.load_state_dict(checkpoint['state_dict'], strict=False) # trun .pyh.tar into readilbe
+    else:
+        model = torch.load(weights)
 
     """Load testing data"""
     data_transforms = data_transform(image_size)
@@ -62,7 +65,6 @@ def main(opt):
     print(f'Confusion Matrix :\n {cm}')
 
     new_val_classes = test_dataset.classes
-    print(new_val_classes)
     plot_matrix(nor_cm, new_val_classes, model_name)
 
     print("I'm so handsome.")

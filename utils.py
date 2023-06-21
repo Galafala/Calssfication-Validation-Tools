@@ -83,7 +83,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 best_acc = epoch_acc
                 best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
-                print(f'Best occured!')
+                print(f'-----------Best occured!-----------')
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
                 val_loss_history.append(epoch_loss)
