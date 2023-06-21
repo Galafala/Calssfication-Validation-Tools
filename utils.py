@@ -20,6 +20,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     best_acc = 0.0
     best_loss = 0.0
     best_epoch = 0
+    last_epoch = 0
     
 
     for epoch in range(num_epochs):
@@ -93,17 +94,18 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 train_loss_history.append(epoch_loss)
 
         if early_stopping(epoch, epoch_acc):
+            last_epoch = epoch+1
             break
         
         print()
 
     time_elapsed = time.time() - since
     print(f'Training complete in {time_elapsed//60:.0f}m {time_elapsed%60:.0f}s')
-    print(f'Best val Acc: {best_acc:4f} in epoch {best_epoch}')
+    print(f'Best val Acc: {best_acc:.4f} in epoch {best_epoch}')
 
     # load best model weights
     model.load_state_dict(best_model_wts)
-    return model, val_acc_history, val_loss_history, train_acc_history, train_loss_history
+    return model, val_acc_history, val_loss_history, train_acc_history, train_loss_history, last_epoch
 
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
@@ -283,14 +285,13 @@ class EarlyStopping:
         self.possible_stop = False  # possible stop may occur next epoch
 
     def __call__(self, epoch, fitness):
-        print(f'fitness >= self.best_fitness: {fitness >= self.best_fitness}')
         if fitness >= self.best_fitness:  # >= 0 to allow for early zero-fitness stage of training
             self.best_epoch = epoch
             self.best_fitness = fitness
         delta = epoch - self.best_epoch  # epochs without improvement
-        print(f'Epochs without improvement: {delta}.'
-              f'Current fitness: {fitness:4f} in epoch {epoch}.'
-              f'Best fitness: {self.best_fitness:4f} in best_epoch {self.best_epoch}.')
+        print(f'Epochs without improvement: {delta}. '
+              f'Current fitness: {fitness:.4f} in epoch {epoch}. '
+              f'Best fitness: {self.best_fitness:.4f} in best_epoch {self.best_epoch}.')
         self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
         stop = delta >= self.patience  # stop training if patience exceeded
         if stop:

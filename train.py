@@ -92,14 +92,14 @@ def main(opt):
     criterion = nn.CrossEntropyLoss()
 
     """Train and evaluate"""    
-    model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience)
+    model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist, last_epoch = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience)
     torch.save(model_ft, 'weight.pth')
     
     val_acc_hist = [val_acc.to('cpu') for val_acc in val_acc_hist]
     train_acc_hist = [train_acc.to('cpu') for train_acc in train_acc_hist]
     
-    plot_val_train_hist(num_epochs, val_loss_hist, train_loss_hist, model_name, 'Loss')
-    plot_val_train_hist(num_epochs, val_acc_hist, train_acc_hist, model_name, 'Accuracy')
+    plot_val_train_hist(last_epoch, val_loss_hist, train_loss_hist, model_name, 'Loss')
+    plot_val_train_hist(last_epoch, val_acc_hist, train_acc_hist, model_name, 'Accuracy')
 
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
 
