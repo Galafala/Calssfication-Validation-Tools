@@ -103,13 +103,17 @@ def main(opt):
 
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
 
-    pred, true, paths = predict(test_dataset, model_ft, batch_size, device)
-    print(paths)
+    preds, trues, paths = predict(test_dataset, model_ft, batch_size, device)
+    
+    with open('result.txt', 'w') as txt:
+        txt.write('pred, true, path')
+        for pred, true, path in zip(preds, trues, paths):
+            txt.write(f'\n{pred}, {true}, {path}')
 
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
-    acc_score = accuracy_score(true, pred)
-    cm = confusion_matrix(true, pred)
-    nor_cm = confusion_matrix(true, pred, normalize="true")
+    acc_score = accuracy_score(trues, preds)
+    cm = confusion_matrix(trues, preds)
+    nor_cm = confusion_matrix(trues, preds, normalize="true")
     print(f'Accuracy : {acc_score}')
     print(f'Confusion Matrix :\n {cm}')
 
