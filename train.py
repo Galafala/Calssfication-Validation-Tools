@@ -15,8 +15,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 from torchvision import datasets
-from pathlib import Path
-PATH = Path().resolve()
 
 from utils import *
 from sklearn.metrics import confusion_matrix, accuracy_score
@@ -52,8 +50,6 @@ def main(opt):
     device = opt.get('device')
     input_size = opt.get('imgsz')
     feature_extract = None
-    
-    os.makedirs(os.path.join(PATH, 'run'), exist_ok=True)
 
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
 

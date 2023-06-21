@@ -243,7 +243,7 @@ def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Ac
     plt.ylabel(Loss_or_Accuracy)
     plt.xlabel('Epoch')
     plt.legend()
-    plt.savefig(f'/run/{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
+    plt.savefig(f'{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
     # plt.show()
 
 def plot_matrix(cm, classes="", name="confusion_matrix"):
@@ -260,7 +260,7 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
     ax.set_ylabel('True', fontsize=24, fontweight ='bold')
     ax.set_xlabel('Predicted', fontsize=24, fontweight ='bold')
 
-    plt.savefig(f'/run/{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
+    plt.savefig(f'{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     # plt.show()
 
 class EarlyStopping:
