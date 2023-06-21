@@ -63,9 +63,9 @@ def main(opt):
             txt.write(f'\n{pred}, {true}, {path}')
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
-    acc_score = accuracy_score(true, pred)
-    cm = confusion_matrix(true, pred)
-    nor_cm = confusion_matrix(true, pred, normalize="true")
+    acc_score = accuracy_score(trues, preds)
+    cm = confusion_matrix(trues, preds)
+    nor_cm = confusion_matrix(trues, preds, normalize="true")
     print(f'Accuracy : {acc_score}')
     print(f'Confusion Matrix :\n {cm}')
 
