@@ -18,7 +18,6 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
-    best_loss = 0.0
     best_epoch = 0
     last_epoch = 0
     
@@ -80,9 +79,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
-            if phase == 'val' and epoch_acc > best_acc and epoch_loss < best_loss:
+            if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
-                best_loss = epoch_loss
                 best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
                 print(f'Best occured!')
