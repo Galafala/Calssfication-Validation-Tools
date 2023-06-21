@@ -234,8 +234,8 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy = 'Loss'):
-    torch.Tensor.cpu()
-
+    val_hist = [torch.Tensor.cpu(val) for val in val_hist]
+    train_hist = [torch.Tensor.cpu(train) for train in train_hist]
     print(val for val in val_hist)
     print(train for train in train_hist)
 
