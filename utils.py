@@ -18,10 +18,14 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+    best_loss = 0.0
+    best_epoch = 0
+    
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
+        epoch_acc = 0.0
 
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
@@ -75,8 +79,10 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
-            if phase == 'val' and epoch_acc > best_acc:
+            if phase == 'val' and epoch_acc > best_acc and epoch_loss < best_loss:
                 best_acc = epoch_acc
+                best_loss = epoch_loss
+                best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
@@ -91,8 +97,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
         print()
 
     time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
+    print(f'Training complete in {time_elapsed//60:.0f}m {time_elapsed%60:.0f}s')
+    print(f'Best val Acc: {best_acc:4f} in epoch {best_epoch}')
 
     # load best model weights
     model.load_state_dict(best_model_wts)
@@ -249,7 +255,7 @@ def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Ac
     plt.xlabel('Epoch')
     plt.legend()
     plt.savefig(f'{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
-    # plt.show()
+    plt.cla()
 
 def plot_matrix(cm, classes="", name="confusion_matrix"):
 #     matplotlib.rcParams['font.sans-serif'] = ['Uuntu Mono'] 
@@ -266,8 +272,8 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
     ax.set_xlabel('Predicted', fontsize=24, fontweight ='bold')
 
     plt.savefig(f'{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
-    # plt.show()
-
+    plt.cla()
+    
 class EarlyStopping:
     def __init__(self, patience=30):
         self.best_fitness = 0.0  # i.e. mAP
@@ -280,6 +286,9 @@ class EarlyStopping:
             self.best_epoch = epoch
             self.best_fitness = fitness
         delta = epoch - self.best_epoch  # epochs without improvement
+        print(f'Epochs without improvement: {delta}'
+              f'Current fitness: {fitness:4f}'
+              f'Best fitness: {self.best_fitness:4f}')
         self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
         stop = delta >= self.patience  # stop training if patience exceeded
         if stop:

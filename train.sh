@@ -6,4 +6,4 @@ python train.py\
  --batch-size 64\
  --device 2\
  --imgsz 224\
- --patience 30
+ --patience 15
