@@ -92,7 +92,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 train_acc_history.append(epoch_acc)
                 train_loss_history.append(epoch_loss)
 
-        if early_stopping(num_epochs, epoch_acc):
+        if early_stopping(epoch, epoch_acc):
             break
         
         print()
