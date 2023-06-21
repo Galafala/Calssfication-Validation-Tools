@@ -207,7 +207,7 @@ def predict(test_set, model, batch_size, device):
     
     
     with torch.no_grad():
-        for i, (images, target, path) in enumerate(test_loader):
+        for _, (images, target, path) in enumerate(test_loader):
             images = images.to(device)
             target = target.to(device)
             output = model(images)

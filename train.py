@@ -103,7 +103,7 @@ def main(opt):
 
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
 
-    pred, true, paths = predict(test_dataset['val'], model_ft, batch_size, device)
+    pred, true, paths = predict(test_dataset, model_ft, batch_size, device)
     print(paths)
 
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
