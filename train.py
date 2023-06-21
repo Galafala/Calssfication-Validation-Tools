@@ -16,6 +16,7 @@ import torch.optim as optim
 import torchvision
 from torchvision import datasets
 from pathlib import Path
+PATH = Path().resolve()
 
 from utils import *
 from sklearn.metrics import confusion_matrix, accuracy_score
@@ -52,7 +53,7 @@ def main(opt):
     input_size = opt.get('imgsz')
     feature_extract = None
     
-    os.makedirs(os.path.join(Path().resolve(), 'run'), exist_ok=True)
+    os.makedirs(os.path.join(PATH, 'run'), exist_ok=True)
 
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
 
@@ -96,7 +97,7 @@ def main(opt):
 
     """Train and evaluate"""    
     model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience)
-    torch.save(model_ft, os.path.join(Path().resolve(), '/run/weight.pth'))
+    torch.save(model_ft, os.path.join(PATH, '/run/weight.pth'))
 
     plot_val_train_hist(num_epochs, val_loss_hist, train_loss_hist, model_name, 'Loss')
     plot_val_train_hist(num_epochs, val_acc_hist, train_acc_hist, model_name, 'Accuracy')
