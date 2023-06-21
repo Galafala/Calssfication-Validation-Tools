@@ -98,11 +98,12 @@ def main(opt):
     val_acc_hist = [val_acc.to('cpu') for val_acc in val_acc_hist]
     train_acc_hist = [train_acc.to('cpu') for train_acc in train_acc_hist]
     
-    print(val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist)
     plot_val_train_hist(num_epochs, val_loss_hist, train_loss_hist, model_name, 'Loss')
     plot_val_train_hist(num_epochs, val_acc_hist, train_acc_hist, model_name, 'Accuracy')
 
-    pred, true, paths = predict(image_datasets['val'], model_ft, batch_size, device)
+    test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
+
+    pred, true, paths = predict(test_dataset['val'], model_ft, batch_size, device)
     print(paths)
 
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
