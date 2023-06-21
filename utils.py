@@ -84,6 +84,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 best_loss = epoch_loss
                 best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
+                print(f'Best occured!')
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
                 val_loss_history.append(epoch_loss)
@@ -273,7 +274,7 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
 
     plt.savefig(f'{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     plt.cla()
-    
+
 class EarlyStopping:
     def __init__(self, patience=30):
         self.best_fitness = 0.0  # i.e. mAP
@@ -282,13 +283,14 @@ class EarlyStopping:
         self.possible_stop = False  # possible stop may occur next epoch
 
     def __call__(self, epoch, fitness):
+        print(f'fitness >= self.best_fitness: {fitness >= self.best_fitness}')
         if fitness >= self.best_fitness:  # >= 0 to allow for early zero-fitness stage of training
             self.best_epoch = epoch
             self.best_fitness = fitness
         delta = epoch - self.best_epoch  # epochs without improvement
-        print(f'Epochs without improvement: {delta}'
-              f'Current fitness: {fitness:4f}'
-              f'Best fitness: {self.best_fitness:4f}')
+        print(f'Epochs without improvement: {delta}.'
+              f'Current fitness: {fitness:4f} in epoch {epoch}.'
+              f'Best fitness: {self.best_fitness:4f} in best_epoch {self.best_epoch}.')
         self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
         stop = delta >= self.patience  # stop training if patience exceeded
         if stop:
