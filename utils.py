@@ -234,8 +234,8 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy = 'Loss'):
-    val_hist = [val.data.cpu().numpy() for val in val_hist]
-    train_hist = [train.data.cpu().numpy() for train in train_hist]
+    val_hist = np.array([val.item() for val in val_hist])
+    train_hist = np.array([train.item() for train in train_hist])
    
     x=np.arange(0,num_epochs,1)
     plt.figure(figsize=(9,9))
