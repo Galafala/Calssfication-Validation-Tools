@@ -1,7 +1,7 @@
 """
 Quick start:
 
-python val.py --weights "/home/ubuntu/Classification-Validation-Tools/weight.pth" --data "/home/nas/Research_Group/Personal/Andrew/birth_event_detection/dataset/train_and_val/val" --batch-size 64 --device 2 --imgsz 224
+python val.py --weights "/home/ubuntu/Classification-Validation-Tools/weight.pth" --data "/home/nas/Research_Group/Personal/Andrew/birth_event_detection/dataset/train_and_val/val" --batch-size 64 --device 2 --imgsz 224 --name "cm_validation_dataset"
 
 I hold your back bro.
 
@@ -27,6 +27,7 @@ def parse_opt(known=False):
     parser.add_argument('--batch-size', type=int, default=16, help='total batch size for all GPUs')
     parser.add_argument('--device', type=int, default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='inference size (pixels)')
+    parser.add_argument('--name', type=str, default='confusion_matrix_validation', help='name of images')
 
     opt = parser.parse_args()
     return opt
@@ -37,7 +38,7 @@ def main(opt):
     batch_size = opt.get('batch_size')
     device = opt.get('device')
     image_size = opt.get('imgsz')
-    model_name = "Confusion Matrix"
+    model_name = opt.get('name')
 
     """Detect if we have a GPU available"""
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
@@ -55,7 +56,11 @@ def main(opt):
     test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
 
     """Predict"""
-    pred, true, _ = predict(test_dataset, model, batch_size, device)
+    preds, trues, paths = predict(test_dataset, model, batch_size, device)
+    with open('result.txt', 'w') as txt:
+        txt.write('pred, true, path')
+        for pred, true, path in zip(preds, trues, paths):
+            txt.write(f'\n{pred}, {true}, {path}')
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(true, pred)
@@ -83,5 +88,6 @@ if __name__ == "__main__":
 
             opt[key] = value
 
-    print(opt)
+    for key, value in opt.items():
+        print(f"{key}: {value}")
     main(opt)
