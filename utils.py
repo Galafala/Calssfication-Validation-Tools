@@ -7,6 +7,30 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+class EarlyStopping:
+    def __init__(self, patience=30):
+        self.best_fitness = 0.0  # i.e. mAP
+        self.best_epoch = 0
+        self.patience = patience or float('inf')  # epochs to wait after fitness stops improving to stop
+        self.possible_stop = False  # possible stop may occur next epoch
+
+    def __call__(self, epoch, fitness):
+        if fitness >= self.best_fitness:  # >= 0 to allow for early zero-fitness stage of training
+            self.best_epoch = epoch
+            self.best_fitness = fitness
+        delta = epoch - self.best_epoch  # epochs without improvement
+        print(f'Epochs without improvement: {delta}. '
+              f'Current fitness: {fitness:.4f} in epoch {epoch}. '
+              f'Best fitness: {self.best_fitness:.4f} in best_epoch {self.best_epoch}.')
+        self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
+        stop = delta >= self.patience  # stop training if patience exceeded
+        if stop:
+            print(f'\nStopping training early as no improvement observed in last {self.patience} epochs. '
+                  f'Best results observed at epoch {self.best_epoch}, best model saved as best.pt.\n'
+                  f'To update EarlyStopping(patience={self.patience}) pass a new patience value, '
+                  f'i.e. `python train.py --patience 300` or use `--patience 0` to disable EarlyStopping.')
+        return stop
+
 def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False, patience=50):
     since = time.time()
     early_stopping = EarlyStopping(patience)
@@ -21,7 +45,9 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     best_epoch = 0
     last_epoch = 0
     
-
+    with open('result.csv', 'a') as txt:
+        txt.write('epoch train_loss train_acc val_loss val_acc')
+    
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
@@ -48,10 +74,12 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 # forward
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'train'):
-                    # Get model outputs and calculate loss
-                    # Special case for inception because in training it has an auxiliary output. In train
-                    #   mode we calculate the loss by summing the final output and the auxiliary output
-                    #   but in testing we only consider the final output.
+                    """
+                    Get model outputs and calculate loss
+                    Special case for inception because in training it has an auxiliary output. In train
+                    mode we calculate the loss by summing the final output and the auxiliary output
+                    but in testing we only consider the final output.
+                    """
                     if is_inception and phase == 'train':
                         # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
                         outputs, aux_outputs = model(inputs)
@@ -75,7 +103,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
-
+            
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
@@ -85,9 +113,13 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 best_model_wts = copy.deepcopy(model.state_dict())
                 print(f'-----------Best occured!-----------')
             if phase == 'val':
+                with open('result.csv', 'a') as txt:
+                    txt.write(f' {epoch_loss} {epoch_acc}')
                 val_acc_history.append(epoch_acc)
                 val_loss_history.append(epoch_loss)
             else:
+                with open('result.csv', 'a') as txt:
+                    txt.write(f'\n{epoch} {epoch_loss} {epoch_acc}')
                 train_acc_history.append(epoch_acc)
                 train_loss_history.append(epoch_loss)
 
@@ -99,7 +131,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
 
     time_elapsed = time.time() - since
     print(f'Training complete in {time_elapsed//60:.0f}m {time_elapsed%60:.0f}s')
-    print(f'Best val Acc: {best_acc:.4f} in epoch {best_epoch}')
+    print(f'Best val Acc: {best_acc:.4f} in epoch {best_epoch}\n')
 
     # load best model weights
     model.load_state_dict(best_model_wts)
@@ -130,7 +162,7 @@ def data_transform(input_size):
     }
     
     return data_transforms
-    
+      
 def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
     # Initialize these variables which will be set in this if statement. Each of these
     # variables is model specific.
@@ -241,11 +273,6 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy = 'Loss'):
-    # print(val.device for val in val_hist)
-    # print(train.device for train in train_hist)
-
-    # print("-----------------end-------------------")
-
     x=np.arange(0,num_epochs,1)
     plt.figure(figsize=(9,9))
     plt.plot(x, val_hist, label='test', color = 'limegreen', linewidth=2)
@@ -274,27 +301,3 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
 
     plt.savefig(f'{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     plt.cla()
-
-class EarlyStopping:
-    def __init__(self, patience=30):
-        self.best_fitness = 0.0  # i.e. mAP
-        self.best_epoch = 0
-        self.patience = patience or float('inf')  # epochs to wait after fitness stops improving to stop
-        self.possible_stop = False  # possible stop may occur next epoch
-
-    def __call__(self, epoch, fitness):
-        if fitness >= self.best_fitness:  # >= 0 to allow for early zero-fitness stage of training
-            self.best_epoch = epoch
-            self.best_fitness = fitness
-        delta = epoch - self.best_epoch  # epochs without improvement
-        print(f'Epochs without improvement: {delta}. '
-              f'Current fitness: {fitness:.4f} in epoch {epoch}. '
-              f'Best fitness: {self.best_fitness:.4f} in best_epoch {self.best_epoch}.')
-        self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
-        stop = delta >= self.patience  # stop training if patience exceeded
-        if stop:
-            print(f'\nStopping training early as no improvement observed in last {self.patience} epochs. '
-                        f'Best results observed at epoch {self.best_epoch}, best model saved as best.pt.\n'
-                        f'To update EarlyStopping(patience={self.patience}) pass a new patience value, '
-                        f'i.e. `python train.py --patience 300` or use `--patience 0` to disable EarlyStopping.')
-        return stop

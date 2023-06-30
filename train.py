@@ -104,7 +104,7 @@ def main(opt):
     test_dataset = ImageFolderWithPaths(f"{data_dir}/val", data_transforms["val"])    
 
     preds, trues, paths = predict(test_dataset, model_ft, batch_size, device)
-    with open('result.txt', 'w') as txt:
+    with open('prediction.txt', 'w') as txt:
         txt.write('pred, true, path')
         for pred, true, path in zip(preds, trues, paths):
             txt.write(f'\n{pred}, {true}, {path}')
