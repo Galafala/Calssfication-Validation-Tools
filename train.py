@@ -17,6 +17,7 @@ import torchvision
 from torchvision import datasets
 
 from utils import *
+from model import *
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 print("PyTorch Version: ",torch.__version__)
@@ -104,10 +105,12 @@ def main(opt):
     test_dataset = ImageFolderWithPaths(f"{data_dir}/val", data_transforms["val"])    
 
     preds, trues, paths = predict(test_dataset, model_ft, batch_size, device)
-    with open('prediction.txt', 'w') as txt:
-        txt.write('pred, true, path')
-        for pred, true, path in zip(preds, trues, paths):
-            txt.write(f'\n{pred}, {true}, {path}')
+    record('train', preds, trues, paths)
+
+    # with open('train_prediction.csv', 'w') as txt:
+    #     txt.write('pred true path')
+    #     for pred, true, path in zip(preds, trues, paths):
+    #         txt.write(f'\n{pred} {true} {path}')
 
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(trues, preds)

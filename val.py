@@ -14,7 +14,7 @@ import torch
 import torchvision
 from torchvision.models import efficientnet_b2
 
-from utils import data_transform, predict, ImageFolderWithPaths, plot_matrix
+from utils import data_transform, predict, ImageFolderWithPaths, plot_matrix, record
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 print("PyTorch Version: ",torch.__version__)
@@ -53,14 +53,16 @@ def main(opt):
 
     """Load testing data"""
     data_transforms = data_transform(image_size)
-    test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])    
+    test_dataset = ImageFolderWithPaths(f"{data_dir}", data_transforms["val"])
 
     """Predict"""
     preds, trues, paths = predict(test_dataset, model, batch_size, device)
-    with open('result.txt', 'w') as txt:
-        txt.write('pred, true, path')
-        for pred, true, path in zip(preds, trues, paths):
-            txt.write(f'\n{pred}, {true}, {path}')
+    record('val', preds, trues, paths)
+
+    # with open('val_prediction.csv', 'w') as txt:
+    #     txt.write('pred true path')
+    #     for pred, true, path in zip(preds, trues, paths):
+    #         txt.write(f'\n{pred} {true} {path}')
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(trues, preds)

@@ -1,8 +1,7 @@
 import time
 import copy
 import torch
-import torch.nn as nn
-from torchvision import datasets, models, transforms
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -137,103 +136,6 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     model.load_state_dict(best_model_wts)
     return model, val_acc_history, val_loss_history, train_acc_history, train_loss_history, last_epoch
 
-def set_parameter_requires_grad(model, feature_extracting):
-    if feature_extracting:
-        for param in model.parameters():
-            param.requires_grad = False
-
-def data_transform(input_size):
-    data_transforms = {
-        'train': transforms.Compose([
-    #         transforms.CenterCrop(3000),
-            transforms.Resize((input_size, input_size)),
-            transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomHorizontalFlip(),
-            transforms.ColorJitter(brightness=(0.5,2), contrast=(0.5,2), saturation=(0.5,2), hue=0.1),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ]),
-        'val': transforms.Compose([
-    #         transforms.CenterCrop(3000),
-            transforms.Resize((input_size, input_size)),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ])
-    }
-    
-    return data_transforms
-      
-def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
-    # Initialize these variables which will be set in this if statement. Each of these
-    # variables is model specific.
-    model_ft = None
-
-    if model_name == "resnet":
-        """ Resnet18
-        """
-        model_ft = models.resnet18(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-
-    elif model_name == "alexnet":
-        """ Alexnet
-        """
-        model_ft = models.alexnet(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-
-    elif model_name == "vgg":
-        """ VGG11_bn
-        """
-        model_ft = models.vgg11_bn(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
-
-    elif model_name == "squeezenet":
-        """ Squeezenet
-        """
-        model_ft = models.squeezenet1_0(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1))
-        model_ft.num_classes = num_classes
-
-    elif model_name == "densenet":
-        """ Densenet
-        """
-        model_ft = models.densenet121(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier.in_features
-        model_ft.classifier = nn.Linear(num_ftrs, num_classes)
-
-    elif model_name == "inception":
-        """ Inception v3
-        Be careful, expects (299,299) sized images and has auxiliary output
-        """
-        model_ft = models.inception_v3(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        # Handle the auxilary net
-        num_ftrs = model_ft.AuxLogits.fc.in_features
-        model_ft.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
-        # Handle the primary net
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs,num_classes)
-
-    elif model_name == "efficientnet_b2":
-        """ efficientnet_b2
-        """
-        model_ft = models.efficientnet_b2(pretrained=use_pretrained)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        model_ft.num_classes = num_classes
-
-    else:
-        print("Invalid model name, exiting...")
-        exit()
-
-    return model_ft
-
 def predict(test_set, model, batch_size, device):
     y_pred = []
     y_true = []
@@ -259,6 +161,28 @@ def predict(test_set, model, batch_size, device):
 
     return y_pred, y_true, paths
 
+"""data"""
+def data_transform(input_size):
+    data_transforms = {
+        'train': transforms.Compose([
+    #         transforms.CenterCrop(3000),
+            transforms.Resize((input_size, input_size)),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomHorizontalFlip(),
+            transforms.ColorJitter(brightness=(0.5,2), contrast=(0.5,2), saturation=(0.5,2), hue=0.1),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'val': transforms.Compose([
+    #         transforms.CenterCrop(3000),
+            transforms.Resize((input_size, input_size)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+    }
+    
+    return data_transforms
+
 class ImageFolderWithPaths(datasets.ImageFolder):
     """Custom dataset that includes image file paths. Extends torchvision.datasets.ImageFolder"""
 
@@ -272,6 +196,7 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         tuple_with_path = (original_tuple + (path,))
         return tuple_with_path
 
+"""plot result"""
 def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy = 'Loss'):
     x=np.arange(0,num_epochs,1)
     plt.figure(figsize=(9,9))
@@ -301,3 +226,9 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
 
     plt.savefig(f'{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     plt.cla()
+
+def record(phase, preds, trues, paths):
+    with open(f'{phase}_prediction.csv', 'w') as txt:
+        txt.write('pred, true, path')
+        for pred, true, path in zip(preds, trues, paths):
+            txt.write(f'\n{pred}, {true}, {path}')
