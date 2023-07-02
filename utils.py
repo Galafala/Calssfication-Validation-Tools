@@ -45,7 +45,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     last_epoch = 0
     
     with open('result.csv', 'a') as txt:
-        txt.write('epoch train_loss train_acc val_loss val_acc')
+        txt.write('epoch, train_loss, train_acc, val_loss, val_acc')
     
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -113,12 +113,12 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 print(f'-----------Best occured!-----------')
             if phase == 'val':
                 with open('result.csv', 'a') as txt:
-                    txt.write(f' {epoch_loss} {epoch_acc}')
+                    txt.write(f'{epoch_loss}, {epoch_acc}')
                 val_acc_history.append(epoch_acc)
                 val_loss_history.append(epoch_loss)
             else:
                 with open('result.csv', 'a') as txt:
-                    txt.write(f'\n{epoch} {epoch_loss} {epoch_acc}')
+                    txt.write(f'\n{epoch}, {epoch_loss}, {epoch_acc}, ')
                 train_acc_history.append(epoch_acc)
                 train_loss_history.append(epoch_loss)
 
