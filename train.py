@@ -106,8 +106,8 @@ def main(opt):
     val_acc_hist = [val_acc.to('cpu') for val_acc in val_acc_hist]
     train_acc_hist = [train_acc.to('cpu') for train_acc in train_acc_hist]
     
-    plot_hist(last_epoch, val_loss_hist, train_loss_hist, model_name, 'Loss', save_dir)
-    plot_hist(last_epoch, val_acc_hist, train_acc_hist, model_name, 'Accuracy', save_dir)
+    plot_hist(last_epoch, val_loss_hist, train_loss_hist, 'Loss', save_dir)
+    plot_hist(last_epoch, val_acc_hist, train_acc_hist, 'Accuracy', save_dir)
 
     test_dataset = ImageFolderWithPaths(f"{data_dir}/val", data_transforms["val"])    
 
@@ -127,7 +127,7 @@ def main(opt):
     print(f'Confusion Matrix :\n {cm}')
 
     new_val_classes = image_datasets['val'].classes
-    plot_matrix(nor_cm, new_val_classes, 'confusion_matrix')
+    plot_matrix(nor_cm, new_val_classes, 'confusion_matrix', save_dir)
 
     print("I'm so handsome.")
 
