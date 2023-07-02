@@ -100,7 +100,7 @@ def main(opt):
     criterion = nn.CrossEntropyLoss()
 
     """Train and evaluate"""    
-    model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist, last_epoch = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience)
+    model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist, last_epoch = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience, save_dir=save_dir)
     torch.save(model_ft, os.path.join(save_dir, 'weight.pth.tar'))
     
     val_acc_hist = [val_acc.to('cpu') for val_acc in val_acc_hist]
