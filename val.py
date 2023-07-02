@@ -8,17 +8,21 @@ I hold your back bro.
 Ben,
 June 18th, 2023
 """ 
-
+import os
 import argparse
 import torch
 import torchvision
 from torchvision.models import efficientnet_b2
+from pathlib import Path
 
-from utils import data_transform, predict, ImageFolderWithPaths, plot_matrix, record
+from utils import data_transform, predict, ImageFolderWithPaths, plot_matrix, record, increment_path
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
+
+ROOT = Path(__file__).parent
+ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -43,6 +47,9 @@ def main(opt):
     """Detect if we have a GPU available"""
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
 
+    """create save directory and return the path"""
+    save_dir = increment_path(f'{ROOT}/runs/val/exp1')
+
     """Load model"""
     if weights.endswith('.tar'):
         checkpoint = torch.load(weights)
@@ -57,12 +64,7 @@ def main(opt):
 
     """Predict"""
     preds, trues, paths = predict(test_dataset, model, batch_size, device)
-    record('val', preds, trues, paths)
-
-    # with open('val_prediction.csv', 'w') as txt:
-    #     txt.write('pred true path')
-    #     for pred, true, path in zip(preds, trues, paths):
-    #         txt.write(f'\n{pred} {true} {path}')
+    record('val', preds, trues, paths, save_dir)
     
     """Using predicted results to calculate an accuracy score and draw a confusion matrix"""
     acc_score = accuracy_score(trues, preds)
@@ -72,7 +74,7 @@ def main(opt):
     print(f'Confusion Matrix :\n {cm}')
 
     new_val_classes = test_dataset.classes
-    plot_matrix(nor_cm, new_val_classes, model_name)
+    plot_matrix(nor_cm, new_val_classes, model_name, save_dir)
 
     print("I'm so handsome.")
 

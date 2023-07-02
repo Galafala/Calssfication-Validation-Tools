@@ -50,7 +50,7 @@ class EarlyStopping:
                   f'i.e. `python train.py --patience 300` or use `--patience 0` to disable EarlyStopping.')
         return stop
 
-def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False, patience=50):
+def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25, is_inception=False, patience=50, save_dir=''):
     since = time.time()
     early_stopping = EarlyStopping(patience)
 
@@ -64,7 +64,7 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     best_epoch = 0
     last_epoch = 0
     
-    with open('result.csv', 'a') as txt:
+    with open(f'{save_dir}/result.csv', 'a') as txt:
         txt.write('epoch, train_loss, train_acc, val_loss, val_acc')
     
     for epoch in range(num_epochs):
@@ -132,12 +132,12 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
                 best_model_wts = copy.deepcopy(model.state_dict())
                 print(f'-----------Best occured!-----------')
             if phase == 'val':
-                with open('result.csv', 'a') as txt:
+                with open(f'{save_dir}/result.csv', 'a') as txt:
                     txt.write(f'{epoch_loss}, {epoch_acc}')
                 val_acc_history.append(epoch_acc)
                 val_loss_history.append(epoch_loss)
             else:
-                with open('result.csv', 'a') as txt:
+                with open(f'{save_dir}/result.csv', 'a') as txt:
                     txt.write(f'\n{epoch}, {epoch_loss}, {epoch_acc}, ')
                 train_acc_history.append(epoch_acc)
                 train_loss_history.append(epoch_loss)
@@ -248,8 +248,8 @@ def plot_matrix(cm, classes="", name="confusion_matrix", save_dir=""):
     plt.savefig(f'{save_dir}/{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     plt.cla()
 
-def record(phase, preds, trues, paths):
-    with open(f'{phase}_prediction.csv', 'w') as txt:
+def record(phase, preds, trues, paths, save_dir):
+    with open(f'{save_dir}/{phase}_prediction.csv', 'w') as txt:
         txt.write('pred, true, path')
         for pred, true, path in zip(preds, trues, paths):
             txt.write(f'\n{pred}, {true}, {path}')
