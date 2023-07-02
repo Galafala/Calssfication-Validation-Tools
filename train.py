@@ -15,6 +15,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 from torchvision import datasets
+from pathlib import Path
 
 from utils import *
 from model import *
@@ -22,6 +23,9 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 
 print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
+
+ROOT = Path(__file__).parent
+ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -51,8 +55,11 @@ def main(opt):
     device = opt.get('device')
     input_size = opt.get('imgsz')
     feature_extract = None
-
+    
     device = torch.device(f"cuda:{device}" if torch.cuda.is_available() else "cpu")
+
+    """create save directory and return the path"""
+    save_dir = increment_path(f'{ROOT}/runs/train/exp1')
 
     """Initialize the model for this run"""
     model_ft = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
@@ -94,13 +101,13 @@ def main(opt):
 
     """Train and evaluate"""    
     model_ft, val_acc_hist, val_loss_hist, train_acc_hist, train_loss_hist, last_epoch = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, device, num_epochs=num_epochs, is_inception=(model_name=="inception"), patience=patience)
-    torch.save(model_ft, 'weight.pth.tar')
+    torch.save(model_ft, os.path.join(save_dir, 'weight.pth.tar'))
     
     val_acc_hist = [val_acc.to('cpu') for val_acc in val_acc_hist]
     train_acc_hist = [train_acc.to('cpu') for train_acc in train_acc_hist]
     
-    plot_val_train_hist(last_epoch, val_loss_hist, train_loss_hist, model_name, 'Loss')
-    plot_val_train_hist(last_epoch, val_acc_hist, train_acc_hist, model_name, 'Accuracy')
+    plot_hist(last_epoch, val_loss_hist, train_loss_hist, model_name, 'Loss', save_dir)
+    plot_hist(last_epoch, val_acc_hist, train_acc_hist, model_name, 'Accuracy', save_dir)
 
     test_dataset = ImageFolderWithPaths(f"{data_dir}/val", data_transforms["val"])    
 

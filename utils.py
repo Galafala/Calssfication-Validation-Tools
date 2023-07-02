@@ -1,3 +1,4 @@
+import os
 import time
 import copy
 import torch
@@ -5,7 +6,26 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from pathlib import Path
 
+def increment_path(path) -> str:
+    # Increment file or directory path, i.e. runs/exp --> runs/exp{sep}2, runs/exp{sep}3, ... etc.
+    path = Path(path[:-1])  # os-agnostic
+    # if path.exists() and not exist_ok:
+        # path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
+
+    for n in range(1, 9999):
+        p = f'{path}{n}'  # increment path
+        if not os.path.exists(p):  #
+            break
+    path = Path(p)
+
+    path.mkdir(parents=True, exist_ok=True)  # make directory
+
+    return str(path)
+
+
+"""model training"""
 class EarlyStopping:
     def __init__(self, patience=30):
         self.best_fitness = 0.0  # i.e. mAP
@@ -197,7 +217,7 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         return tuple_with_path
 
 """plot result"""
-def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy = 'Loss'):
+def plot_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Accuracy, save_dir):
     x=np.arange(0,num_epochs,1)
     plt.figure(figsize=(9,9))
     plt.plot(x, val_hist, label='test', color = 'limegreen', linewidth=2)
@@ -207,10 +227,10 @@ def plot_val_train_hist(num_epochs, val_hist, train_hist, model_name, Loss_or_Ac
     plt.ylabel(Loss_or_Accuracy)
     plt.xlabel('Epoch')
     plt.legend()
-    plt.savefig(f'{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
+    plt.savefig(f'{save_dir}/{Loss_or_Accuracy} of {model_name}.png', transparent=True, bbox_inches='tight', dpi=600)
     plt.cla()
 
-def plot_matrix(cm, classes="", name="confusion_matrix"):
+def plot_matrix(cm, classes="", name="confusion_matrix", save_dir=""):
 #     matplotlib.rcParams['font.sans-serif'] = ['Uuntu Mono'] 
 #     matplotlib.rcParams['font.serif'] = ['Uuntu Mono'] 
     f, ax= plt.subplots(figsize = (15, 15))
@@ -224,7 +244,7 @@ def plot_matrix(cm, classes="", name="confusion_matrix"):
     ax.set_ylabel('True', fontsize=24, fontweight ='bold')
     ax.set_xlabel('Predicted', fontsize=24, fontweight ='bold')
 
-    plt.savefig(f'{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
+    plt.savefig(f'{save_dir}/{name}.jpg', transparent=True, bbox_inches='tight', dpi=600)
     plt.cla()
 
 def record(phase, preds, trues, paths):
