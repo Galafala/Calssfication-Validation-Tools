@@ -112,7 +112,7 @@ def main(opt):
     test_dataset = ImageFolderWithPaths(f"{data_dir}/val", data_transforms["val"])    
 
     preds, trues, paths = predict(test_dataset, model_ft, batch_size, device)
-    record('train', preds, trues, paths)
+    record('train', preds, trues, paths, save_dir)
 
     # with open('train_prediction.csv', 'w') as txt:
     #     txt.write('pred true path')
