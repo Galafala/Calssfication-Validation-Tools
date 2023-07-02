@@ -146,7 +146,8 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
             last_epoch = epoch+1
             break
         
-        print()
+        last_epoch = epoch+1
+        print('')
 
     time_elapsed = time.time() - since
     print(f'Training complete in {time_elapsed//60:.0f}m {time_elapsed%60:.0f}s')
